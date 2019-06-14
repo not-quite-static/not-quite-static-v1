@@ -1,0 +1,18 @@
+{
+    "name": "zarlo/not-quite-static",
+    "description": "a not quite ststic site",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "nqs\\": "src/core/"
+        }
+    },
+    "require": {
+        "twig/twig": "^2.7",
+        "symfony/yaml": "^4.3"
+    },
+    "scripts": {
+        "start": "php -S 0.0.0.0:8080 -t public",
+        "test": "phpunit"
+    }
+}
