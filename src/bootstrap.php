@@ -4,6 +4,7 @@ use Symfony\Component\Yaml\Yaml;
 
 use nqs\render;
 use nqs\database;
+use nqs\router;
 
 $config = Yaml::parse(file_get_contents( dirname(dirname(__FILE__)) . "/config.yml"));
 
@@ -16,56 +17,9 @@ if($config['globals'])
 
 render::init($config);
 
-function isRegex ($route)
-{
+router::init($config);
 
-    return @preg_match("/^\/[\s\S]+\/$/", $route) ? true : false;
-
-}
-
-function is404 ($route)
-{
-
-    $isregex = isRegex($route);
-    $isroute = false;
-    if($route['path'] == $_SERVER['REQUEST_URI'])
-    {
-        $isroute = true;   
-    }
-
-    $found = ($isroute or $isregex);
-
-    return $found;
-
-};
-
-$routes  = array_filter($config['routes'], "is404");
-$route   = null;
-$matches = null;
-foreach ($routes as $value) {
-
-
-    if($value['path'] == $_SERVER['REQUEST_URI'])
-    {
-
-        $route = $value;
-        break;
-
-    }
-
-    if(isRegex($value['path']))
-    {
-        if(@preg_match($value['path'], $_SERVER['REQUEST_URI'], $matches))
-        {
-
-            $route = $value;
-            break;
-
-        }
-    }
-
-}
-
+$route = router::getRoute();
 
 if($route == null)
 {
@@ -75,12 +29,11 @@ if($route == null)
 
 }
 
-if ($matches != null)
+if (isset($route['matches']))
 {
-    for ($i=0; $i < sizeof($matches); $i++) { 
+    for ($i = 0; $i < sizeof($route['matches']); $i++) { 
 
-
-        database::add([ "parm_". $i => $matches[$i] ]);
+        database::add([ "parm_". $i => $route['matches'][$i] ]);
 
     }
 }
@@ -88,7 +41,7 @@ if ($matches != null)
 if(isset($route['databases']))
 {
 
-    for ($i=0; $i < sizeof($route); $i++) { 
+    for ($i = 0; $i < sizeof($route); $i++) { 
 
         database::load($route['databases'][$i]);
 

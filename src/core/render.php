@@ -28,6 +28,20 @@ class render {
             'cache' => $settings['render']['cache'] ? dirname(dirname(dirname(__FILE__))) . "/cache/" : false,
         ]);
 
+        if(isset($settings['twig_extension']))
+        {
+            foreach ($settings['twig_extensions'] as $value) {
+                render::addExtension($value);
+            }
+        }
+
+    }
+
+    public static function addExtension($extension)
+    {
+
+        return render::$twig->addExtension($extension);
+
     }
 
     public static function render($path, $data)

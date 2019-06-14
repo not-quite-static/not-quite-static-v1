@@ -38,6 +38,12 @@ class database {
 
             break;
 
+            case "php":
+
+                $data = include_once $file_data;
+
+            break;
+
 
         }
 
