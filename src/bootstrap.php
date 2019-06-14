@@ -16,18 +16,19 @@ if($config['globals'])
 
 render::init($config);
 
+$is404 = true;
+
 foreach ($config['routes'] as $route) {
     //  || $route['path'] == parse_url($_SERVER['REQUEST_URI'])
     if(@preg_match($route['path'], $_SERVER['REQUEST_URI'], $matches)  || $route['path'] == $_SERVER['REQUEST_URI'])
     {
 
-        $url_parms = [];
-
         if ($matches != null)
         {
             for ($i=0; $i < sizeof($matches); $i++) { 
 
-                database::add([ "parm-"+$i => $matches[$i] ]);
+
+                database::add([ "parm_". $i => $matches[$i] ]);
 
             }
         }
@@ -44,7 +45,14 @@ foreach ($config['routes'] as $route) {
         }
 
         echo render::render($route['view'], database::$data);
-
+        $is404 = false;
+        break;
     }
 }
+
+if($is404)
+{
+    echo render::render($config['error_404'], database::$data);
+}
+
 

@@ -28,7 +28,7 @@ class database {
 
             case "json":
 
-                $data = json_decode($file_data);
+                $data = json_decode($file_data, true);
 
             break;
 
@@ -41,7 +41,8 @@ class database {
 
         }
 
-        array_push(database::$data, $data);
+        
+        database::$data = array_merge(database::$data, $data);
 
     }
 
@@ -49,7 +50,7 @@ class database {
     public static function add($data)
     {
 
-        array_push(database::$data, $data);
+        database::$data = array_merge(database::$data, $data);
 
     }
 
