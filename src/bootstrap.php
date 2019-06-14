@@ -16,43 +16,87 @@ if($config['globals'])
 
 render::init($config);
 
-$is404 = true;
+function isRegex ($route)
+{
 
-foreach ($config['routes'] as $route) {
-    //  || $route['path'] == parse_url($_SERVER['REQUEST_URI'])
-    if(@preg_match($route['path'], $_SERVER['REQUEST_URI'], $matches)  || $route['path'] == $_SERVER['REQUEST_URI'])
+    return @preg_match("/^\/[\s\S]+\/$/", $route) ? true : false;
+
+}
+
+function is404 ($route)
+{
+
+    $isregex = isRegex($route);
+    $isroute = false;
+    if($route['path'] == $_SERVER['REQUEST_URI'])
+    {
+        $isroute = true;   
+    }
+
+    $found = ($isroute or $isregex);
+
+    return $found;
+
+};
+
+$routes  = array_filter($config['routes'], "is404");
+$route   = null;
+$matches = null;
+foreach ($routes as $value) {
+
+
+    if($value['path'] == $_SERVER['REQUEST_URI'])
     {
 
-        if ($matches != null)
-        {
-            for ($i=0; $i < sizeof($matches); $i++) { 
-
-
-                database::add([ "parm_". $i => $matches[$i] ]);
-
-            }
-        }
-
-        if(isset($route['databases']))
-        {
-
-            for ($i=0; $i < sizeof($route); $i++) { 
-
-                database::load($route['databases'][$i]);
-
-            }
-
-        }
-
-        echo render::render($route['view'], database::$data);
-        $is404 = false;
+        $route = $value;
         break;
+
+    }
+
+    if(isRegex($value['path']))
+    {
+        if(@preg_match($value['path'], $_SERVER['REQUEST_URI'], $matches))
+        {
+
+            $route = $value;
+            break;
+
+        }
+    }
+
+}
+
+
+if($route == null)
+{
+
+    echo render::render($config['error_404'], database::$data);
+    return;
+
+}
+
+if ($matches != null)
+{
+    for ($i=0; $i < sizeof($matches); $i++) { 
+
+
+        database::add([ "parm_". $i => $matches[$i] ]);
+
     }
 }
 
-if($is404)
+if(isset($route['databases']))
 {
-    echo render::render($config['error_404'], database::$data);
+
+    for ($i=0; $i < sizeof($route); $i++) { 
+
+        database::load($route['databases'][$i]);
+
+    }
+
 }
+
+echo render::render($route['view'], database::$data);
+
 
 

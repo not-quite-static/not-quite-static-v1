@@ -7,17 +7,11 @@ render:
 error_404: "404.html"
 
 routes:
-
   - path: "^\\/number\\/(\\d+)^"
     view: "number.html" 
-
   - path: "/"
     view: "index.html"
-
   - path: "/hello/world"
     view: "hello_world.html"
-
-   
-
   - path: "/404"
     view: "404.html"
