@@ -1,7 +1,5 @@
 <?php
 
-
-
 namespace nqs;
 
 use Symfony\Component\Yaml\Yaml;
@@ -21,37 +19,36 @@ class database {
 
         $data = [];
 
-        $file_data = file_get_contents( dirname(dirname(dirname(__FILE__))) . "/database//" . $path );
+        $file_data = @file_get_contents( dirname(dirname(dirname(__FILE__))) . "/database//" . $path );
 
-        switch(database::get_extension($path))
-        {
+        if(isset($file_data)){
+            switch(database::get_extension($path))
+            {
 
-            case "json":
+                case "json":
 
-                $data = json_decode($file_data, true);
+                    $data = json_decode($file_data, true);
 
-            break;
+                break;
 
-            case "yml":
+                case "yml":
 
-                $data = Yaml::parse($file_data);
+                    $data = Yaml::parse($file_data);
 
-            break;
+                break;
 
-            case "php":
+                case "php":
 
-                $data = include_once $file_data;
+                    $data = include_once $file_data;
 
-            break;
+                break;
 
-
+            }
         }
 
-        
         database::$data = array_merge(database::$data, $data);
 
     }
-
 
     public static function add($data)
     {

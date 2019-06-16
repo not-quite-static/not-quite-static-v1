@@ -9,7 +9,7 @@ class router {
     public static function init($settings)
     {
 
-        router::$routes = $settings['routes'];
+        router::$routes = $settings;
 
     }
 
@@ -20,27 +20,22 @@ class router {
         $matches = null;
 
         foreach (router::$routes as $value) {
-        
-        
+                
             if($value['path'] == $_SERVER['REQUEST_URI'])
             {
         
-                $route = $value;
-                
+                $route = $value;              
                 break;
         
-            }
-       
+            }       
 
             if(@preg_match($value['path'], $_SERVER['REQUEST_URI'], $matches))
             {
     
                 $route = $value;
-                
                 break;
     
             }
-            
         
         }
 
@@ -54,7 +49,6 @@ class router {
         return $route;
 
     }
-
 
     private static function isRegex ($route)
     {

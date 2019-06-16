@@ -1,55 +1,30 @@
 <?php
 
-use Symfony\Component\Yaml\Yaml;
-
 use nqs\render;
 use nqs\database;
 use nqs\router;
+use nqs\view;
+use nqs\config;
+use nqs\pluginManager;
 
-$config = Yaml::parse(file_get_contents( dirname(dirname(__FILE__)) . "/config.yml"));
+pluginManager::preinit();
 
-if($config['globals'])
-{
-    foreach ($config['globals'] as $file) {
-        database::load($file);
-    }
-}
+config::init();
 
-render::init($config);
+router::init(config::getRoutes());
+render::init(config::getRender());
 
-router::init($config);
+pluginManager::init();
 
 $route = router::getRoute();
 
+pluginManager::postinit();
+
+$_view;
+
 if($route == null)
-{
+    $_view = new view(config::get404());
+else
+    $_view = new view($route);
 
-    echo render::render($config['error_404'], database::$data);
-    return;
-
-}
-
-if (isset($route['matches']))
-{
-    for ($i = 0; $i < sizeof($route['matches']); $i++) { 
-
-        database::add([ "parm_". $i => $route['matches'][$i] ]);
-
-    }
-}
-
-if(isset($route['databases']))
-{
-
-    for ($i = 0; $i < sizeof($route); $i++) { 
-
-        database::load($route['databases'][$i]);
-
-    }
-
-}
-
-echo render::render($route['view'], database::$data);
-
-
-
+$_view->render();

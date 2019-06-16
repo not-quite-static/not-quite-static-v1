@@ -1,10 +1,13 @@
+config: 1
+
 globals:
   - "global.yml"
 
 render:
   cache: false
 
-error_404: "404.html"
+error_404: 
+  view: "404.html"
 
 routes:
   - path: "^\\/number\\/(\\d+)^"
