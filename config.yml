@@ -11,7 +11,9 @@ error_404:
 
 routes:
   - path: "^\\/number\\/(\\d+)^"
-    view: "number.html" 
+    view: "number.html"
+  - path: "^\\/blog\\/(\\d+)^"
+    view: "blog.html" 
   - path: "/"
     view: "index.html"
   - path: "/hello/world"

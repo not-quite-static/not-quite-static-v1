@@ -1,0 +1,18 @@
+{% extends 'layout.html' %}
+
+
+
+{% block content %}
+
+{% set data = read_data("/blog/" ~ parm_1 ~ ".yml") %}
+
+{% if data %}
+    {{ data.title }}<br>
+    {{ data.data|raw }}
+{% else %}
+
+<p>no blog post found</p>
+
+{% endif %}
+
+{% endblock  %}

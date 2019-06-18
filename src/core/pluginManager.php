@@ -1,61 +1,47 @@
 <?php
 namespace nqs;
 
-use nqs\iplugin;
 
 class pluginManager {
 
-    private static $plugins;
+    private static $listeners = array();
 
-    public static function preinit()
-    {
+
+    public static function load() {
 
         $plugins = glob(dirname(dirname(dirname(__FILE__))) . '/plugins/*' , GLOB_ONLYDIR);
-
         foreach ($plugins as $value) {
             if(file_exists($value . "/main.php"))
                 include $value . "/main.php";
         }
 
-        pluginManager::$plugins = array_filter(
-            get_declared_classes(), 
-            function ($className) {
-                return in_array('iplugin', class_implements($className));
-            }
-        );
-
-
-        foreach(pluginManager::$plugins as $plugin)
-        {
-
-            $plugin->preinit();
-
-        }
-
     }
 
-    public static function init()
-    {
-        
-        foreach(pluginManager::$plugins as $plugin)
-        {
+    public static function hook() {
+        global $listeners;
 
-            $plugin->init();
+        $num_args = func_num_args();
+        $args = func_get_args();
 
+        if($num_args < 1)
+            trigger_error("Insufficient arguments", E_USER_ERROR);
+
+        // Hook name should always be first argument
+        $hook_name = array_shift($args);
+
+        if(!isset($listeners[$hook_name]))
+            return; // No plugins have registered this hook
+
+        foreach($listeners[$hook_name] as $func) {
+            $args = $func($args); 
         }
-
+        return $args;
     }
 
-    public static function postinit()
-    {
-
-        foreach(pluginManager::$plugins as $plugin)
-        {
-
-            $plugin->postinit();
-
-        }
-
+    public static function add_listener($hook, $function_name) {
+        global $listeners;
+        $listeners[$hook][] = $function_name;
     }
+
 
 }

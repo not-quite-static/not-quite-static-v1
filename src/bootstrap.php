@@ -7,18 +7,20 @@ use nqs\view;
 use nqs\config;
 use nqs\pluginManager;
 
-pluginManager::preinit();
+pluginManager::load();
+
+pluginManager::hook("preinit");
 
 config::init();
 
 router::init(config::getRoutes());
 render::init(config::getRender());
 
-pluginManager::init();
+pluginManager::hook("init");
 
 $route = router::getRoute();
 
-pluginManager::postinit();
+pluginManager::hook("postinit");
 
 $_view;
 
