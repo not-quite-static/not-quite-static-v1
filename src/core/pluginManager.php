@@ -1,11 +1,9 @@
 <?php
 namespace nqs;
 
-
 class pluginManager {
 
     private static $listeners = array();
-
 
     public static function load() {
 
@@ -26,11 +24,10 @@ class pluginManager {
         if($num_args < 1)
             trigger_error("Insufficient arguments", E_USER_ERROR);
 
-        // Hook name should always be first argument
         $hook_name = array_shift($args);
 
         if(!isset($listeners[$hook_name]))
-            return; // No plugins have registered this hook
+            return;
 
         foreach($listeners[$hook_name] as $func) {
             $args = $func($args); 
@@ -42,6 +39,5 @@ class pluginManager {
         global $listeners;
         $listeners[$hook][] = $function_name;
     }
-
 
 }

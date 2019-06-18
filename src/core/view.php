@@ -3,7 +3,6 @@ namespace nqs;
 
 class view {
 
-
     private $view;
 
     public function __construct($view)
@@ -12,15 +11,19 @@ class view {
         $this->view = $view;
 
         if (isset($view['matches']))
-        for ($i = 0; $i < sizeof($view['matches']); $i++) 
-            database::add([ "parm_". $i => $view['matches'][$i]]);
-    
+        {
+            for ($i = 0; $i < sizeof($view['matches']); $i++) 
+                database::add([ "parm_". $i => $view['matches'][$i]]);
+        }
+        else
+        {
+            database::add([ "parm_1" => $this->view['view']]);
+        }
+
         if(isset($view['databases']))
             for ($i = 0; $i < sizeof($view); $i++)
                 database::load($view['databases'][$i]);
     
-    
-
     }
 
     public function render()

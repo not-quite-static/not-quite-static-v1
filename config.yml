@@ -9,6 +9,9 @@ render:
 error_404: 
   view: "404.html"
 
+# trusted_proxies:
+#   - 10.0.0.0/8
+
 routes:
   - path: "^\\/number\\/(\\d+)^"
     view: "number.html"

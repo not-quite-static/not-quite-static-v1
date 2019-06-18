@@ -13,8 +13,15 @@ class router {
 
     }
 
+    private static $route = null;
+
     public static function getRoute()
     {
+
+        if(router::$route != null)
+        {
+            return router::$route;
+        }
 
         $route   = null;
         $matches = null;
@@ -45,6 +52,10 @@ class router {
             return array_merge($route, array('matches' => $matches));
         
         }
+
+        // $route = pluginManager::hook("route", $route);
+
+        router::$route = $route;
 
         return $route;
 

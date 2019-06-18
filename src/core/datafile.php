@@ -51,4 +51,36 @@ class datafile {
 
     }
 
+    public static function write($path, $data)
+    {
+
+        $file_data = [];
+
+
+        switch(datafile::get_extension($path))
+        {
+
+            case "json":
+
+                $file_data = json_encode($data);
+
+            break;
+
+            case "yml":
+
+                $file_data = Yaml::dump($data);
+
+            break;
+
+            case "php":
+
+                $file_data = serialize($data);
+
+            break;
+        }
+            
+        file_put_contents(dirname(dirname(dirname(__FILE__))) . "/database//" . $path, $file_data);
+
+    }
+
 }

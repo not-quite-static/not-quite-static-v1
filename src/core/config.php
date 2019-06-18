@@ -34,23 +34,22 @@ class config {
 
     public static function get404()
     {
-
         return config::$config['error_404'];
-
     }
 
     public static function getRoutes()
     {
-
         return config::$config['routes'];
-
     }
 
     public static function getRender()
     {
-
         return config::$config['render'];
+    }
 
+    public static function getTrustedProxies()
+    {
+        return isset(config::$config['trusted_proxies'])? config::$config['trusted_proxies'] : false;
     }
 
 }
