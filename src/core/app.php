@@ -45,7 +45,7 @@ class app {
         
         $route = router::getRoute();
         
-        $_view;
+        $_view = null;
         
         if($route == null)
             $_view = new view(config::get404());
