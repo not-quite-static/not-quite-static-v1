@@ -12,5 +12,7 @@ if (PHP_SAPI == 'cli-server') {
 
 }
 
+$start_time = microtime(TRUE);
+
 require __DIR__ . '/../vendor/autoload.php';
 require __DIR__ . '/../src/bootstrap.php';

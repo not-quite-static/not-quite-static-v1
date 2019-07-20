@@ -30,6 +30,15 @@ class render {
             foreach ($settings['twig_extensions'] as $value) 
                 render::addExtension($value);
 
+        function loadtime() {
+            global $start_time;
+            $end_time = microtime(TRUE);
+            $time_taken = $end_time - $start_time;
+            return round($time_taken,5);
+        }
+    
+        render::$twig->addGlobal('load_time', loadtime());
+
 
     }
 

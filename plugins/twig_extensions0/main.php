@@ -47,8 +47,14 @@ class twig_extension1_twig extends AbstractExtension {
         return array(
             new \Twig\TwigFunction('read_data', array($this, 'read_data')),
             new \Twig\TwigFunction('write_data', array($this, 'write_data')),
+            new \Twig\TwigFunction('date', array($this, 'date')),
         );
     }
+
+    public function date($format)
+    {
+        return date($format);
+    }   
 
     public function write_data($path, $data)
     {
