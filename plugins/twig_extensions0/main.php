@@ -48,6 +48,7 @@ class twig_extension1_twig extends AbstractExtension {
             new \Twig\TwigFunction('read_data', array($this, 'read_data')),
             new \Twig\TwigFunction('write_data', array($this, 'write_data')),
             new \Twig\TwigFunction('date', array($this, 'date')),
+            new \Twig\TwigFunction('download_cahe', array($this, 'download_cahe')),
         );
     }
 
@@ -64,6 +65,19 @@ class twig_extension1_twig extends AbstractExtension {
     public function read_data($path)
     {
         return datafile::read($path);
+    }
+    
+    public function download_cahe($url, $name, $ttl)
+    {
+        $cache_file =  dirname(dirname(dirname(__FILE__))) . "/cache/dl_" . $name;
+        if (file_exists($cache_file) && (filemtime($cache_file) > (time() - $ttl ))) {
+           $file = file_get_contents($cache_file);
+        
+        } else {
+
+           $file = file_get_contents($url);
+           file_put_contents($cache_file, $file, LOCK_EX);
+        }
     }
 
 }
