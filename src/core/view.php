@@ -10,6 +10,9 @@ class view {
         
         $this->view = $view;
 
+        if(!isset($this->view['view']))
+           return;
+
         if (isset($view['matches']))
         {
             for ($i = 0; $i < sizeof($view['matches']); $i++) 
@@ -29,6 +32,12 @@ class view {
     public function render()
     {
         
+        if(isset($this->view['url']))
+        {
+            header('Location: ' . $this->view['url']);
+            return;
+        }
+
         echo render::render($this->view['view'], database::$data);
         return;
 

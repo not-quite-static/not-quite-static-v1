@@ -21,5 +21,7 @@ routes:
     view: "index.html"
   - path: "/hello/world"
     view: "hello_world.html"
+  - path: "/google"
+    url: "https://google.com"
   - path: "/404"
     view: "404.html"

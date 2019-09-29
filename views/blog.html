@@ -8,7 +8,7 @@
 
 {% if data %}
     {{ data.title }}<br>
-    {{ data.data|raw }}
+    {{ render_file("/blog/" ~ parm_1 ~ ".md") }}
 {% else %}
 
 <p>no blog post found</p>
