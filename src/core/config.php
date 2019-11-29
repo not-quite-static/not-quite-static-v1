@@ -2,6 +2,7 @@
 namespace nqs;
 
 use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\Yaml\Exception\ParseException;
 
 class config {
 
@@ -12,24 +13,25 @@ class config {
     public static function init()
     {
 
-        config::$config = Yaml::parse(file_get_contents( dirname(dirname(dirname(__FILE__))) . "/config.yml"));
+        $path = dirname(dirname(dirname(__FILE__))) . "/config.yml";
 
-        if(config::$config != config::$configV)
-        {
-
-            config::upgradeConfig();
-
+        try {
+            config::$config = Yaml::parseFile($path);
+        } catch (ParseException $th) {
+            echo "can't read config";
+            echo $th->getMessage();
+            die();
         }
-
+        
         if(isset(config::$config['globals']))
             foreach (config::$config['globals'] as $file) 
                 database::load($file);
         
     }
 
-    private static function upgradeConfig()
+    public static function isCache()
     {
-
+        return config::$config['cache'];
     }
 
     public static function get404()

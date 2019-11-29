@@ -8,7 +8,7 @@ class database {
     public static function load($path)
     {
 
-        database::$data = array_merge(database::$data, datafile::read($path));
+        database::add(datafile::read($path));
 
     }
 

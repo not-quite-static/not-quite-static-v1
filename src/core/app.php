@@ -1,59 +1,152 @@
 <?php
 namespace nqs;
 
-class app {
+use \FastRoute\simpleDispatcher;
+use \FastRoute\RouteCollector;
 
-    public static function init()
-    {
+use \Twig\Loader\FilesystemLoader;
+use \Twig\Environment;
 
-        config::init();
+class App {
 
-        router::init(config::getRoutes());
-        render::init(config::getRender());
+    private static $routes;
+    private static $dispatcher;
+    private static $twig_loader;
+    private static $twig;
+    
+
+    public static function makeApp() {
         
-        pluginManager::hook("init");
+        config::init();
+        pluginManager::load();
+
+        App::$routes = config::getRoutes();
+
+        pluginManager::hook('router-init');
+
+        if(config::isCache() == False)
+            App::$dispatcher = \FastRoute\simpleDispatcher(App::makeRoutes());
+        else
+            App::$dispatcher = \FastRoute\cachedDispatcher(App::makeRoutes(), [
+                'cacheFile' => dirname(dirname(dirname(__FILE__))) . "/cache/route.cache", /* required */
+            ]);
+
+        pluginManager::hook('router-done');
+        pluginManager::hook('twig-init');
+        App::$twig_loader = new FilesystemLoader(dirname(dirname(dirname(__FILE__))) . "/views/");
+        App::$twig = new Environment(App::$twig_loader, [
+            'cache' => config::isCache() ? dirname(dirname(dirname(__FILE__))) . "/cache/" : false,
+        ]);
+        pluginManager::hook('twig-done');
 
     }
 
-    public static function RemoteIP()
-    {
+    private static function makeRoutes() {
 
-        if (isset($_SERVER['HTTP_X_remote_ip']))
-        {
+        return function(\FastRoute\RouteCollector $r) {
 
-            if(config::getTrustedProxies())
-            {
+            foreach (App::$routes as $route) {
+                
+                if(is_array($route['path']))
+                    foreach ($route['path'] as $url)
+                        $r->addRoute('GET', $url, $route);
+                else
+                    $r->addRoute('GET', $route['path'], $route);    
+                
+               
 
-                foreach(config::getTrustedProxies() as $CIDR)
-                {
-                    if(CIDR_check::match($_SERVER['HTTP_CLIENT_IP'], $CIDR))
-                    {
-                        return $_SERVER['HTTP_X_remote_ip'];
-                    }
-                }
             }
 
-
-        }
-
-        return $_SERVER['HTTP_CLIENT_IP'];
+        };
 
     }
 
-    public static function run()
+    public static function Run()
     {
         
-        $route = router::getRoute();
+        $httpMethod = $_SERVER['REQUEST_METHOD'];
+        $uri = $_SERVER['REQUEST_URI'];
         
-        $_view = null;
-        
-        if($route == null)
-            $_view = new view(config::get404());
-        else
-            $_view = new view($route);
-        
-        $_view->render();
+        if (false !== $pos = strpos($uri, '?')) {
+            $uri = substr($uri, 0, $pos);
+        }
 
+        $uri = rawurldecode($uri);
+        database::add([ "parm_2" => $uri]);
+        $routeInfo = App::$dispatcher->dispatch($httpMethod, $uri);
+
+        switch ($routeInfo[0]) {
+            case \FastRoute\Dispatcher::NOT_FOUND:
+                pluginManager::hook('404');
+                $handler = [
+                    'view' => '404.html'   
+                ];
+                database::add([ "parm_1" => '404.html']);
+                
+                App::Render($handler);
+            break;
+            case \FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
+                $allowedMethods = $routeInfo[1];
+                // ... 405 Method Not Allowed
+                echo 4;    
+            break;
+            case \FastRoute\Dispatcher::FOUND:
+                $handler = $routeInfo[1];
+                $vars = $routeInfo[2];
+                
+                if(!isset($handler['url'])) {
+                    database::add([ "parm_1" => $handler['view']]);
+                    
+                    if (isset($vars))
+                    {
+                        for ($i = 2; $i < sizeof($vars); $i++) 
+                            database::add([ "parm_". $i => $vars[$i]]);
+                    }
+            
+                    if(isset($handler['databases']))
+                        for ($i = 0; $i < sizeof($handler['databases']); $i++)
+                            database::load($handler['databases'][$i]);
+                                
+                    App::Render($handler);                    
+                
+                }
+                else {
+                    App::_304($handler);
+                }
+
+                break;
+        }
+
+    }
+
+    private static function _304($route) {
+        pluginManager::hook('304');
+        header('Location: ' . $route['url']);
+    }
+
+    private static function Render($route) {
+
+        function loadtime() {
+            global $start_time;
+            $end_time = microtime(TRUE);
+            $time_taken = $end_time - $start_time;
+            return round($time_taken,5);
+        }
+    
+        App::$twig->addGlobal('load_time', loadtime());
+
+        pluginManager::hook('render');
+        
+        echo App::$twig->render($route['view'], database::$data);
+
+    }
+    public static function addGlobal($key, $value) {
+        App::$twig->addGlobal($key, $value);
+    }
+
+    
+    public static function addExtension($extension) {
+        App::$twig->addExtension($extension);
     }
 
 

@@ -4,14 +4,14 @@ use nqs\datafile;
 use nqs\pluginManager;
 use Twig\Extension\AbstractExtension;
 
-pluginManager::add_listener("init", "register_Twig_Extension");
+pluginManager::add_listener("twig-done", "register_Twig_Extension");
 
 function register_Twig_Extension()
 {
-    \nqs\render::addExtension(new twig_extension1_twig());
-    \nqs\render::getTwigEnvironment()->addGlobal("isTOR", isTOR());
-    \nqs\render::getTwigEnvironment()->addGlobal("POST", $_POST);
-    \nqs\render::getTwigEnvironment()->addGlobal("GET", $_GET);
+    \nqs\App::addExtension(new twig_extension1_twig());
+    //\nqs\App::addGlobal("isTOR", isTOR());
+    \nqs\App::addGlobal("POST", $_POST);
+    \nqs\App::addGlobal("GET", $_GET);
 }
 
 function ReverseIPOctets($inputip){

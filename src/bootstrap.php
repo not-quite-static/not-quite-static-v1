@@ -1,14 +1,7 @@
 <?php
 
-use nqs\app;
+use nqs\App;
 use nqs\pluginManager;
 
-pluginManager::load();
-
-pluginManager::hook("preinit");
-
-app::init();
-
-pluginManager::hook("postinit");
-
-app::run();
+App::makeApp();
+App::Run();

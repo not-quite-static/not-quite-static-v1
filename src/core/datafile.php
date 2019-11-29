@@ -3,7 +3,6 @@ namespace nqs;
 
 use Symfony\Component\Yaml\Yaml;
 
-
 class datafile {
 
     private static function get_extension($file) 
@@ -55,7 +54,6 @@ class datafile {
     {
 
         $file_data = [];
-
 
         switch(datafile::get_extension($path))
         {

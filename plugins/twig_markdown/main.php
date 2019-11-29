@@ -5,11 +5,11 @@ use nqs\pluginManager;
 use nqs\render;
 use Twig\Extension\AbstractExtension;
 
-pluginManager::add_listener("init", "register_Twig_Extension_Markdown");
+pluginManager::add_listener("twig-done", "register_Twig_Extension_Markdown");
 
 function register_Twig_Extension_Markdown()
 {
-    \nqs\render::addExtension(new twig_Markdown_twig());
+    \nqs\App::addExtension(new twig_Markdown_twig());
 }
 
 class twig_Markdown_twig extends AbstractExtension {
@@ -24,7 +24,7 @@ class twig_Markdown_twig extends AbstractExtension {
 
     public function render_file($path)
     {
-        return $this->render(file_get_contents( dirname(dirname(dirname(__FILE__))) . "/database" . $path));
+        return $this->render(file_get_contents( dirname(dirname(dirname(__FILE__))) . $path));
     }   
 
     public function render($string)
