@@ -13,7 +13,6 @@ class App {
     private static $dispatcher;
     private static $twig_loader;
     private static $twig;
-    
 
     public static function makeApp() {
         
@@ -28,7 +27,7 @@ class App {
             App::$dispatcher = \FastRoute\simpleDispatcher(App::makeRoutes());
         else
             App::$dispatcher = \FastRoute\cachedDispatcher(App::makeRoutes(), [
-                'cacheFile' => dirname(dirname(dirname(__FILE__))) . "/cache/route.cache", /* required */
+                'cacheFile' => dirname(dirname(dirname(__FILE__))) . "/cache/route.cache", 
             ]);
 
         pluginManager::hook('router-done');
@@ -49,11 +48,15 @@ class App {
                 
                 if(is_array($route['path']))
                     foreach ($route['path'] as $url)
+                    {
+                        if(!config::getCaseSensitive())
+                            $url = strtolower($url);
                         $r->addRoute('GET', $url, $route);
+                    }
                 else
+                    if(!config::getCaseSensitive())
+                        $route['path'] = strtolower($route['path']);
                     $r->addRoute('GET', $route['path'], $route);    
-                
-               
 
             }
 
@@ -71,24 +74,19 @@ class App {
             $uri = substr($uri, 0, $pos);
         }
 
-        $uri = rawurldecode($uri);
+        $uri = (config::getCaseSensitive())? rawurldecode($uri) : strtolower(rawurldecode($uri));
         database::add([ "parm_2" => $uri]);
         $routeInfo = App::$dispatcher->dispatch($httpMethod, $uri);
 
         switch ($routeInfo[0]) {
             case \FastRoute\Dispatcher::NOT_FOUND:
-                pluginManager::hook('404');
+                pluginManager::hook('404', $route);
                 $handler = [
                     'view' => '404.html'   
                 ];
                 database::add([ "parm_1" => '404.html']);
                 
                 App::Render($handler);
-            break;
-            case \FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
-                $allowedMethods = $routeInfo[1];
-                // ... 405 Method Not Allowed
-                echo 4;    
             break;
             case \FastRoute\Dispatcher::FOUND:
                 $handler = $routeInfo[1];
@@ -115,12 +113,22 @@ class App {
                 }
 
                 break;
+
+            default:
+                pluginManager::hook('500', $route);
+                $handler = [
+                    'view' => '500.html'   
+                ];
+                database::add([ "parm_1" => '500.html']);
+                
+                App::Render($handler);  
+            break;
         }
 
     }
 
     private static function _304($route) {
-        pluginManager::hook('304');
+        pluginManager::hook('304', $route);
         header('Location: ' . $route['url']);
     }
 
@@ -140,14 +148,13 @@ class App {
         echo App::$twig->render($route['view'], database::$data);
 
     }
+
     public static function addGlobal($key, $value) {
         App::$twig->addGlobal($key, $value);
     }
-
     
     public static function addExtension($extension) {
         App::$twig->addExtension($extension);
     }
-
 
 }

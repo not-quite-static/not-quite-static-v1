@@ -14,14 +14,14 @@ namespace nqs;
  * @copyright   Copyright (c) 2015 Frank Forte
  * @license     BSD-3 License https://opensource.org/licenses/BSD-3-Clause
  */
-class CIDR_check{
+class CIDR_check {
 
    /**
 	* compare an IPv4 or IPv6 address with a CIDR address or range
 	*
 	* @param  string  $address a valid IPv6 address
 	* @param  string  $subnet a valid IPv6 subnet[/mask]
-	* @return boolean	whether $address is within the ip range made up  of the subnet and mask
+	* @return boolean whether $address is within the ip range made up  of the subnet and mask
 	*/
     public static function match($ip, $cidr){
 		
@@ -136,7 +136,7 @@ class CIDR_check{
 			}
 		}
 
-		 switch ($ipVersion) {
+		switch ($ipVersion) {
             case 'v4':
 				return self::IPv4Match($ip, $subnet, $mask);
                 break;
@@ -189,7 +189,7 @@ class CIDR_check{
 	* @param  string  $address a valid IPv4 address
 	* @param  string  $subnet a valid IPv4 subnet
 	* @param  string  $mask a valid IPv4 subnet mask
-	* @return boolean	whether $address is within the ip rage made up  of the subnet and mask
+	* @return boolean whether $address is within the ip rage made up  of the subnet and mask
 	*/
 	 private static function IPv4Match($address, $subnet, $mask)
     {

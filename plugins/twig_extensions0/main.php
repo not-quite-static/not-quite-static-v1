@@ -23,20 +23,15 @@ function ReverseIPOctets($inputip){
 
 function isTOR()
 {
-
     try {
-        if (@gethostbyname(ReverseIPOctets($_SERVER['REMOTE_ADDR']).".".$_SERVER['SERVER_PORT'].".".ReverseIPOctets($_SERVER['SERVER_ADDR']).".ip-port.exitlist.torproject.org")=="127.0.0.2") {
-            return true;
-        }
-
         if (strpos($_SERVER['REQUEST_URI'], '.onion') !== false){
             return true;
         }
-
+        if (@gethostbyname(ReverseIPOctets($_SERVER['REMOTE_ADDR']).".".$_SERVER['SERVER_PORT'].".".ReverseIPOctets($_SERVER['SERVER_ADDR']).".ip-port.exitlist.torproject.org")=="127.0.0.2") {
+            return true;
+        }
     } catch (\Throwable $th) {
-        
     }
-
     return false;
 }
 
@@ -47,6 +42,7 @@ class twig_extension1_twig extends AbstractExtension {
         return array(
             new \Twig\TwigFunction('read_data', array($this, 'read_data')),
             new \Twig\TwigFunction('write_data', array($this, 'write_data')),
+            new \Twig\TwigFunction('update_data', array($this, 'update_data')),
             new \Twig\TwigFunction('date', array($this, 'date')),
             new \Twig\TwigFunction('download_cahe', array($this, 'download_cahe')),
         );
@@ -66,18 +62,25 @@ class twig_extension1_twig extends AbstractExtension {
     {
         return datafile::read($path);
     }
+
+    public function update_data($path, $data)
+    {
+
+        $current = $this->read_data($path);
+
+        return $this->write_data($path, array_merge($current, $data));
+    }
     
     public function download_cahe($url, $name, $ttl)
     {
-        $cache_file =  dirname(dirname(dirname(__FILE__))) . "/cache/dl_" . $name;
+        $cache_file =  dirname(dirname(dirname(__FILE__))) . "/cache/dl/" . $name;
         if (file_exists($cache_file) && (filemtime($cache_file) > (time() - $ttl ))) {
            $file = file_get_contents($cache_file);
-        
         } else {
-
            $file = file_get_contents($url);
            file_put_contents($cache_file, $file, LOCK_EX);
         }
+        return $file;
     }
 
 }

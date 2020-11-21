@@ -5,8 +5,7 @@ globals:
 
 cache: true
 
-error_404: 
-  view: "404.html"
+case_sensitive: True
 
 trusted_proxies:
   - 10.0.0.0/8

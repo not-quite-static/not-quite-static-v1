@@ -13,9 +13,7 @@ class datafile {
 
     public static function read($path)
     {
-
         $data = [];
-
         $file_data = @file_get_contents( dirname(dirname(dirname(__FILE__))) . "/database//" . $path );
 
         if(isset($file_data)){
@@ -41,9 +39,7 @@ class datafile {
                 break;
 
             }
-
             return $data;
-
         }
 
         return false;

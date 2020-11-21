@@ -22,11 +22,16 @@ class config {
             echo $th->getMessage();
             die();
         }
-        
+
         if(isset(config::$config['globals']))
             foreach (config::$config['globals'] as $file) 
                 database::load($file);
         
+    }
+
+    public static function getConfig()
+    {
+        return config::$config;
     }
 
     public static function isCache()
@@ -34,14 +39,13 @@ class config {
         return config::$config['cache'];
     }
 
-    public static function get404()
-    {
-        return config::$config['error_404'];
-    }
-
     public static function getRoutes()
     {
         return config::$config['routes'];
+    }
+
+    public static function getCaseSensitive() {
+        return config::$config['case_sensitive'];
     }
 
     public static function getRender()
